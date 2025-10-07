@@ -1,4 +1,3 @@
-
 export function Icon({name}:{name:'home'|'users'|'chart'|'gear'|'filter'|'plus'|'search'|'arrow'|'edit'|'trash'}){
   const m:Record<string,string>={
     home:'M3 12l9-9 9 9M5 10v10h14V10', users:'M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0v1H5v-1z',
@@ -20,13 +19,13 @@ export function Card({children}:{children:React.ReactNode}){
 }
 
 export function BottomNav({active}:{active:'dashboard'|'alumnos'|'progreso'|'generador'}){
-  const base = import.meta.env.BASE_URL
+  const baseHash = '#/'
   const Btn = ({to,icon,label,act}:{to:string,icon:any,label:string,act:boolean}) =>
-    <a className={`bn-btn ${act?'active':''}`} href={to}><Icon name={icon}/><span>{label}</span></a>
+    <a className={`bn-btn ${act?'active':''}`} href={baseHash+to}><Icon name={icon}/><span>{label}</span></a>
   return <nav className="bottom-nav">
-    <Btn to={`${base}pt`} icon="home" label="Dashboard" act={active==='dashboard'} />
-    <Btn to={`${base}pt/alumnos`} icon="users" label="Alumnos" act={active==='alumnos'} />
-    <Btn to={`${base}pt/generador/`} icon="edit" label="Generador" act={active==='generador'} />
-    <Btn to={`${base}pt/progreso/overview`} icon="chart" label="Progreso" act={active==='progreso'} />
+    <Btn to={'pt'} icon="home" label="Dashboard" act={active==='dashboard'} />
+    <Btn to={'pt/alumnos'} icon="users" label="Alumnos" act={active==='alumnos'} />
+    <Btn to={'pt/generador/'} icon="edit" label="Generador" act={active==='generador'} />
+    <Btn to={'pt/progreso/overview'} icon="chart" label="Progreso" act={active==='progreso'} />
   </nav>
 }
