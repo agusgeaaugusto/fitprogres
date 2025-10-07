@@ -1,1 +1,1 @@
-:root{--bg:#0A0F1A;--card:#0F1724;} body{background:var(--bg);color:white;} .card{background:var(--card);} .btn{padding:.5rem 1rem;border-radius:.8rem}
+:root{--bg:#0A0F1A;--card:#0F1724;} body{background:var(--bg);color:white;} .card{background:var(--card);} .btn{padding:.6rem 1rem;border-radius:1rem}

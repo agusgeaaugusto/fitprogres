@@ -1,8 +1,7 @@
 
-webapp/node_modules/
-webapp/dist/
-webapp/.env
-webapp/.env.local
-webapp/.env.production.local
+# general
 .DS_Store
 *.log
+webapp/node_modules/
+webapp/dist/
+webapp/.env*

@@ -1,0 +1,9 @@
+create extension if not exists "uuid-ossp";
+create table if not exists public.trainer ( id uuid primary key, email text unique, licencia_estado text default 'pendiente', licencia_codigo text, licencia_pagada_en timestamptz, created_at timestamptz default now());
+create table if not exists public.license ( id uuid primary key default uuid_generate_v4(), trainer_id uuid references public.trainer(id) on delete cascade, codigo text, estado text default 'pendiente', origen_pago text, created_at timestamptz default now());
+create table if not exists public.student ( id uuid primary key default uuid_generate_v4(), trainer_id uuid references public.trainer(id) on delete cascade, email text, nombre text, estado text default 'activo', ultimo_acceso_at timestamptz);
+create table if not exists public.student_profile ( student_id uuid primary key references public.student(id) on delete cascade, objetivo text, nivel int, frecuencia int, altura_cm int, peso_kg numeric, restricciones text);
+create table if not exists public.exercise ( id bigserial primary key, nombre text, musculo text, tipo text, dificultad int default 1, tags text[]);
+create table if not exists public.program ( id uuid primary key default uuid_generate_v4(), student_id uuid references public.student(id) on delete cascade, nombre text, estado text default 'borrador', publicado_at timestamptz);
+create table if not exists public.program_day ( id uuid primary key default uuid_generate_v4(), program_id uuid references public.program(id) on delete cascade, dia_index int);
+create table if not exists public.program_exercise ( id uuid primary key default uuid_generate_v4(), program_day_id uuid references public.program_day(id) on delete cascade, exercise_id bigint references public.exercise(id), series int, reps int, descanso_seg int);
