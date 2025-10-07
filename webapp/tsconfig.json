@@ -4,7 +4,15 @@
     "module": "ESNext",
     "jsx": "react-jsx",
     "moduleResolution": "bundler",
-    "types": ["vite/client"]
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "baseUrl": ".",
+    "types": [
+      "vite/client"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
