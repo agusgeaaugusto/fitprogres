@@ -1,0 +1,39 @@
+name: functions-deploy
+
+on:
+  push:
+    paths:
+      - 'supabase/functions/**'
+      - '.github/workflows/functions-deploy.yml'
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Login Supabase
+        run: supabase link --project-ref $PROJECT_REF
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Deploy functions
+        run: |
+          supabase functions deploy webhook_pago
+          supabase functions deploy crear_credenciales_alumno
+          supabase functions deploy export_csv
+          supabase functions deploy create_checkout
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Set env secrets (webhook)
+        run: |
+          echo "Recuerda setear WEBHOOK_SECRET_MP / WEBHOOK_SECRET_PAGOPAR en el dashboard de Supabase → Functions."
