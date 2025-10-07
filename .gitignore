@@ -1,0 +1,8 @@
+
+webapp/node_modules/
+webapp/dist/
+webapp/.env
+webapp/.env.local
+webapp/.env.production.local
+.DS_Store
+*.log

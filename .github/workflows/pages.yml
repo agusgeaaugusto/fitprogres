@@ -1,3 +1,4 @@
+
 name: deploy-pages
 on:
   push:
@@ -17,7 +18,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: webapp } }
+    defaults:
+      run:
+        working-directory: webapp
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,12 +34,12 @@ jobs:
           VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
           EOF
-      - run: npm ci
+      - run: npm install
       - run: npm run build
-      - name: SPA fallback 404
-        run: cp dist/index.html dist/404.html
+      - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
-        with: { path: 'webapp/dist' }
+        with:
+          path: webapp/dist
 
   deploy:
     needs: build
