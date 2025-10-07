@@ -1,7 +1,8 @@
-
-# general
-.DS_Store
+# logs / OS
 *.log
-webapp/node_modules/
+.DS_Store
+
+# webapp build / deps / env
 webapp/dist/
+webapp/node_modules/
 webapp/.env*
