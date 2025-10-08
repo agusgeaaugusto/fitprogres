@@ -9,13 +9,13 @@ export function Icon({name}:{name:'home'|'users'|'chart'|'gear'|'filter'|'plus'|
   return <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d={m[name]}/></svg>
 }
 export function Badge({children, color}:{children:React.ReactNode, color?:'blue'|'orange'|'green'|'red'}){
-  return <span className={\`badge \${color||''}\`}>{children}</span>
+  return <span className={`badge ${color||''}`}>{children}</span>
 }
 export function Card({children}:{children:React.ReactNode}){ return <div className="card">{children}</div> }
 export function BottomNav({active}:{active:'dashboard'|'alumnos'|'progreso'|'generador'}){
   const baseHash = '#/'
   const Btn = ({to,icon,label,act}:{to:string,icon:any,label:string,act:boolean}) =>
-    <a className={\`bn-btn \${act?'active':''}\`} href={baseHash+to}><Icon name={icon}/><span>{label}</span></a>
+    <a className={`bn-btn ${act?'active':''}`} href={baseHash+to}><Icon name={icon}/><span>{label}</span></a>
   return <nav className="bottom-nav">
     <Btn to={'pt'} icon="home" label="Dashboard" act={active==='dashboard'} />
     <Btn to={'pt/alumnos'} icon="users" label="Alumnos" act={active==='alumnos'} />

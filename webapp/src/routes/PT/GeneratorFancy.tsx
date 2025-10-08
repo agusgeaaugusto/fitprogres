@@ -1,5 +1,5 @@
 import '../ui/theme.css'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useParams } from 'react-router-dom'
 import { BottomNav, Badge } from '../ui/components'
