@@ -9,9 +9,17 @@ import StudentsFancy from './routes/PT/StudentsFancy'
 import StudentProfileFancy from './routes/PT/StudentProfileFancy'
 import GeneratorFancy from './routes/PT/GeneratorFancy'
 
+const missingEnv = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY
+
 function App() {
   return (
     <HashRouter>
+      {missingEnv && (
+        <div className="container"><div className="card" style={{marginTop:12, borderColor:'#f59e0b'}}>
+          <b>Faltan variables de entorno:</b> VITE_SUPABASE_URL y/o VITE_SUPABASE_ANON_KEY.
+          Configura los Secrets del repo y vuelve a desplegar.
+        </div></div>
+      )}
       <Routes>
         <Route path="/" element={<Navigate to="/pt" replace />} />
         <Route path="/pt" element={<DashboardFancy />} />
