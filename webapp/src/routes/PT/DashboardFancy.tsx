@@ -1,40 +1,43 @@
 import React, { useEffect, useState } from 'react'
-import '../ui/theme.css'
-import { BottomNav, Card } from '../ui/components'
-import { supabase } from '../lib/supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
+import { Card, Badge, BottomNav } from '../../ui/components'
+import { Link } from 'react-router-dom'
 
 export default function DashboardFancy(){
-  const [activos,setActivos]=useState(0)
-  const [recientes,setRecientes]=useState<any[]>([])
-  useEffect(()=>{(async()=>{
-    try{
-      const { data: sAct } = await supabase.rpc('count_students_activos')
-      setActivos(sAct||0)
-    }catch{}
-    const { data: rec } = await supabase.from('student').select('id,nombre,ultimo_acceso_at').order('created_at',{ascending:false}).limit(5)
-    setRecientes(rec||[])
-  })()},[])
-  return <div className="container">
-    <div className="heading">Dashboard</div>
-    <div className="kpi">
-      <div className="box"><h3>Total Alumnos Activos</h3><div className="n">{activos}</div></div>
-      <div className="box"><h3>Nuevos esta semana</h3><div className="n">3</div></div>
-      <div className="box"><h3>Entrenamientos Pendientes</h3><div className="n">2</div></div>
+  const [activos, setActivos] = useState<number>(0)
+  const [nuevos, setNuevos] = useState<number>(0)
+
+  useEffect(()=>{
+    (async ()=>{
+      try{
+        const { data:countActivos } = await supabase.rpc('count_students_activos')
+        setActivos(countActivos ?? 0)
+      }catch{ setActivos(0) }
+      try{
+        const { data } = await supabase.from('student').select('id,created_at').gte('created_at', new Date(Date.now()-7*864e5).toISOString())
+        setNuevos(data?.length ?? 0)
+      }catch{ setNuevos(0) }
+    })()
+  },[])
+
+  return (
+    <div className="container page">
+      <h1>Dashboard</h1>
+      <div className="grid" style={{marginTop:12}}>
+        <Card title="Total Alumnos Activos">
+          <div style={{fontSize:48, fontWeight:800}}>{activos}</div>
+        </Card>
+        <Card title="Nuevos esta semana">
+          <div style={{fontSize:48, fontWeight:800, color:'var(--orange)'}}>+{nuevos}</div>
+        </Card>
+      </div>
+      <div style={{marginTop:16}} className="card">
+        <div className="row" style={{justifyContent:'space-between', alignItems:'center'}}>
+          <h3>Alumnos Recientes</h3>
+          <Link to="/pt/alumnos" className="btn">Ver todos</Link>
+        </div>
+      </div>
+      <BottomNav />
     </div>
-    <div style={{height:10}}/>
-    <Card>
-      <div className="row" style={{justifyContent:'space-between'}}>
-        <b>Alumnos Recientes</b> <a href="#/pt/alumnos">Ver todos →</a>
-      </div>
-      <div className="list" style={{marginTop:8}}>
-        {recientes.map(r => (
-          <div className="list-item" key={r.id}>
-            <div><b>{r.nombre||'Sin nombre'}</b><div style={{fontSize:12,opacity:.7}}>Últ. acceso: {r.ultimo_acceso_at ? new Date(r.ultimo_acceso_at).toLocaleDateString() : '—'}</div></div>
-            <a className="badge blue" href={`#/pt/alumnos/${r.id}/perfil`}>Abrir</a>
-          </div>
-        ))}
-      </div>
-    </Card>
-    <BottomNav active="dashboard"/>
-  </div>
+  )
 }

@@ -1,42 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import '../ui/theme.css'
-import { supabase } from '../lib/supabaseClient'
 import { useParams } from 'react-router-dom'
+import { supabase } from '../../lib/supabaseClient'
+import { Card, Badge, BottomNav } from '../../ui/components'
 
 export default function StudentProfileFancy(){
   const { id } = useParams()
-  const [f,setF]=useState<any>({}); const [msg,setMsg]=useState('')
-  useEffect(()=>{(async()=>{
-    const s = await supabase.from('student').select('*').eq('id', id).maybeSingle()
-    const p = await supabase.from('student_profile').select('*').eq('student_id', id).maybeSingle()
-    setF({ ...(s.data||{}), ...(p.data||{}) })
-  })()},[id])
-  const save = async()=>{
-    await supabase.from('student').update({ nombre:f.nombre, email:f.email, estado:f.estado||'activo' }).eq('id', id)
-    await supabase.from('student_profile').upsert({ student_id:id, objetivo:f.objetivo, nivel:f.nivel, frecuencia:f.frecuencia, restricciones:f.restricciones })
-    setMsg('Guardado ✓')
-  }
-  return <div className="container" style={{maxWidth:720}}>
-    <div className="heading">Ver Perfil</div>
-    <div className="card">
-      <div className="grid" style={{gridTemplateColumns:'1fr 1fr', gap:12}}>
-        <div>Nombre</div><input value={f.nombre||''} onChange={e=>setF({...f,nombre:e.target.value})}/>
-        <div>Correo</div><input value={f.email||''} onChange={e=>setF({...f,email:e.target.value})}/>
-        <div>Objetivo</div>
-        <select value={f.objetivo||'hipertrofia'} onChange={e=>setF({...f,objetivo:e.target.value})}>
-          <option value="hipertrofia">Aumento Muscular</option><option value="resistencia">Resistencia</option><option value="perdida">Pérdida de Peso</option>
-        </select>
-        <div>Nivel</div>
-        <select value={String(f.nivel||1)} onChange={e=>setF({...f,nivel:Number(e.target.value)})}>
-          <option value="1">Principiante</option><option value="2">Intermedio</option><option value="3">Avanzado</option>
-        </select>
-        <div>Restricciones</div><input value={f.restricciones||''} onChange={e=>setF({...f,restricciones:e.target.value})}/>
-        <div>Frecuencia</div><input type="number" value={f.frecuencia||3} onChange={e=>setF({...f,frecuencia:Number(e.target.value)})}/>
-      </div>
-      <div className="row" style={{marginTop:12, justifyContent:'flex-end'}}>
-        <button onClick={save}>Guardar Cambios</button>
-      </div>
-      {msg ? <div className="badge green" style={{marginTop:8}}>{msg}</div> : null}
+  const [name, setName] = useState('')
+  const [status, setStatus] = useState('activo')
+
+  useEffect(()=>{
+    (async()=>{
+      if(!id) return
+      const { data } = await supabase.from('student').select('display_name,status').eq('id', id).maybeSingle()
+      if(data){ setName((data as any).display_name || ''); setStatus((data as any).status || 'activo') }
+    })()
+  },[id])
+
+  return (
+    <div className="container page">
+      <h1>Perfil: {name}</h1>
+      <Card title="Estado" right={<Badge><span className={`status ${status==='inactivo'?'bad':''}`}></span>{status}</Badge>}>
+        <div className="row">
+          <button className="btn" onClick={async()=>{
+            const ns = status==='activo' ? 'inactivo' : 'activo'
+            await supabase.from('student').update({ status: ns }).eq('id', id)
+            setStatus(ns)
+          }}>Alternar estado</button>
+        </div>
+      </Card>
+      <BottomNav />
     </div>
-  </div>
+  )
 }

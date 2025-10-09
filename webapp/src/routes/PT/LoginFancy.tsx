@@ -1,21 +1,26 @@
-import React, { useState } from 'react'
-import '../ui/theme.css'
-import { supabase } from '../lib/supabaseClient'
+import React from 'react'
+import { supabase } from '../../lib/supabaseClient'
 
 export default function LoginFancy(){
-  const [email,setEmail]=useState(''); const [pass,setPass]=useState(''); const [msg,setMsg]=useState('')
-  const go = async()=>{
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)
+    const email = String(data.get('email')||'').trim()
+    const pass = String(data.get('password')||'').trim()
+    if(!email || !pass) return alert('Complete email y contraseña')
     const { error } = await supabase.auth.signInWithPassword({ email, password: pass })
-    if(error){ setMsg(error.message); return }
-    window.location.hash = '#/pt'
+    if(error) alert(error.message); else alert('Login ok')
   }
-  return <div className="container" style={{maxWidth:460}}>
-    <div className="heading">Iniciar Sesión</div>
-    <div className="grid">
-      <div>Correo</div><input value={email} onChange={e=>setEmail(e.target.value)} />
-      <div>Contraseña</div><input type="password" value={pass} onChange={e=>setPass(e.target.value)} />
-      <button onClick={go} style={{marginTop:8}}>Iniciar Sesión</button>
-      {msg ? <div className="badge" style={{marginTop:8, background:'rgba(255,91,99,.15)', borderColor:'#ff5b63', color:'#ffb7bb'}}>{msg}</div> : null}
+  return (
+    <div className="container page">
+      <h1>Iniciar Sesión</h1>
+      <form className="card" onSubmit={onSubmit}>
+        <input className="input" name="email" placeholder="Correo" />
+        <div style={{height:8}}/>
+        <input className="input" name="password" type="password" placeholder="Contraseña" />
+        <div style={{height:12}}/>
+        <button className="btn">Entrar</button>
+      </form>
     </div>
-  </div>
+  )
 }

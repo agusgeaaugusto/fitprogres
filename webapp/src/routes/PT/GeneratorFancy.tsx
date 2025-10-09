@@ -1,48 +1,29 @@
-import React, { useState } from 'react'
-import '../ui/theme.css'
-import { BottomNav, Badge } from '../ui/components'
-import { supabase } from '../lib/supabaseClient'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { supabase } from '../../lib/supabaseClient'
+import { Card, BottomNav } from '../../ui/components'
 
-type Plan = { dia:number, ejercicios:{ id:number, nombre:string, series:number, reps:number }[] }
+type Ex = { id:string, name:string, target:string }
 export default function GeneratorFancy(){
   const { studentId } = useParams()
-  const [plan,setPlan]=useState<Plan[]>([]); const [msg,setMsg]=useState('')
-  const generar = async()=>{
-    const { data: ex } = await supabase.from('exercise').select('id,nombre').limit(60)
-    const base = ex||[]; const tmp:Plan[]=[]
-    for(let d=1; d<=4; d++){ const slice = base.slice((d-1)*5,(d-1)*5+5); tmp.push({ dia:d, ejercicios: slice.map(e => ({ id:e.id, nombre:e.nombre, series:4, reps:10 })) }) }
-    setPlan(tmp); setMsg('Rutina generada.')
-  }
-  const publicar = async()=>{
-    const ins = await supabase.from('program').insert({ student_id: studentId, nombre:'Auto', estado:'publicado', publicado_at:new Date().toISOString() }).select('id').single()
-    const pid = ins.data?.id; if(!pid) return
-    for(const d of plan){
-      const dayIns = await supabase.from('program_day').insert({ program_id: pid, dia_index: d.dia }).select('id').single()
-      const dayId = dayIns.data?.id; if(!dayId) continue
-      for(const e of d.ejercicios){
-        await supabase.from('program_exercise').insert({ program_day_id: dayId, exercise_id: e.id, series: e.series, reps: e.reps, descanso_seg: 90 })
-      }
-    }
-    setMsg('Asignado y publicado ✓')
-  }
-  return <div className="container">
-    <div className="heading">Generador de Entrenamiento</div>
-    <div className="row" style={{justifyContent:'space-between'}}>
-      <button onClick={generar}>Generar Rutina Auto</button>
-      <button className="secondary" onClick={publicar} disabled={plan.length===0}>Guardar y Asignar</button>
+  const [exercises, setExercises] = useState<Ex[]>([])
+
+  useEffect(()=>{
+    (async()=>{
+      const { data } = await supabase.from('exercise').select('id,name,target').limit(8)
+      setExercises((data as any) ?? [])
+    })()
+  },[])
+
+  return (
+    <div className="container page">
+      <h1>Generador de Entrenamiento</h1>
+      <Card title="Rutina sugerida">
+        <ul>
+          {exercises.map(e=>(<li key={e.id}>{e.name} — {e.target}</li>))}
+        </ul>
+      </Card>
+      <BottomNav />
     </div>
-    {msg ? <div className="badge green" style={{marginTop:8}}>{msg}</div> : null}
-    <div style={{height:8}}/>
-    {plan.map(d => (
-      <div key={d.dia} className="card">
-        <div className="row" style={{justifyContent:'space-between'}}>
-          <div><Badge color="blue">Día {d.dia}: FULL BODY</Badge></div>
-          <a className="badge">Editar</a>
-        </div>
-        <ul>{d.ejercicios.map((e,i)=><li key={i} style={{padding:'6px 0'}}>{e.nombre} <span className="badge">{e.series}x{e.reps}</span></li>)}</ul>
-      </div>
-    ))}
-    <BottomNav active="generador"/>
-  </div>
+  )
 }
