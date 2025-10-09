@@ -1,8 +1,9 @@
-# logs / OS
-*.log
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+!.env.example
 .DS_Store
-
-# webapp build / deps / env
-webapp/dist/
-webapp/node_modules/
-webapp/.env*
+Thumbs.db
+.vscode/
